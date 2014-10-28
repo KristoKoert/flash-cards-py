@@ -1,38 +1,35 @@
 __author__ = 'kristo'
 
-from random import randint
+import random
 import json
 
 
 class FlashCard():
 
     def __init__(self, question, answer):
-        #ToDo
-        raise NotImplementedError
+        self._question = question
+        self._answer = answer
 
     @property
-    def get_question(self):
-        #ToDo
-        raise NotImplementedError
+    def question(self):
+        return self._question
 
     @property
-    def get_answer(self):
-        #ToDo
-        raise NotImplementedError
+    def answer(self):
+        return self._answer
 
     @property
-    def get_representation(self):
-        #ToDo
-        raise NotImplementedError
+    def representation(self):
+        return {self._question: self._answer}.items()
 
 
 class DeckOfFlashCards():
 
     _cards = []
 
-    def __init__(self, dictionary=None):
-        if dictionary is not None:
-            self._load_deck_from_json(dictionary)
+    def __init__(self, json_obj=None):
+        if json_obj is not None:
+            self._load_deck_from_json(json_obj)
         else:
             print("Creating new deck..")
             self.deck_name = input("Give a name to deck: ")
@@ -59,28 +56,22 @@ class DeckOfFlashCards():
                     continue
 
     def get_random_card(self):
-        """:returns A random card from self._cards."""
-        #ToDo
-        raise NotImplementedError
+        return self._cards[random.randint(0, len(self._cards)-1)]
 
     def _load_deck_from_json(self, json_obj):
-        """Fills up self._cards with FlashCard objects.
-         FlashCard constructor parameters read from json file."""
-        #ToDo
-        raise NotImplementedError
+        for key in json_obj.keys():
+                self._cards.append(FlashCard(key, json_obj[key]))
+        print("Finished loading deck.")
 
     def _create_card(self):
-        """Asks user for question and answer. These are used to create an instance of FlashCard and this is in turn
-        appended to self._cards."""
-        #ToDo
-        raise NotImplementedError
+        question = input("Enter the question: ")
+        answer = input("Enter the answer: ")
+        self._cards.append(FlashCard(question, answer))
 
     def save_deck(self):
-        """All card representations are added together into a dictionary. This is in turn written to a file."""
         data = {}
         for card in self._cards:
-            #ToDo
-            raise NotImplementedError
+            data = dict(data.items() | card.representation)
         json.dump(data, open(self.deck_name, "w"),  sort_keys=True, indent=4, separators=(',', ': '))
 
 
@@ -103,15 +94,11 @@ class FlashCardExercise():
                 break
 
     def _prompt_for_deck(self):
-        """Prompts user for a deck, which either needs to be created or loaded.
-        :returns An instance of DeckOfFlashCards.
-        """
         while True:
             self._give_instructions_deck()
-            response = input()
+            response = input("")
             if response == "-n":
-                #ToDo
-                raise NotImplementedError
+                return DeckOfFlashCards()
             elif response == "-l":
                 return self._load_deck()
             else:
@@ -119,27 +106,27 @@ class FlashCardExercise():
                 continue
 
     def _create_new_deck(self):
-        """Creates a new DeckOfFlashCards."""
-        #ToDo
-        raise NotImplementedError
+        self.deck = DeckOfFlashCards()
 
     @staticmethod
     def _load_deck():
-        """A deck is loaded from json.
-        :returns An instance of DeckOfFlashCards
-        """
         while True:
             file_name = input("Please enter name of file with deck data: ")
-            #ToDo
-            raise NotImplementedError
+            try:
+                json_obj = json.load(open(file_name, "r"))
+                return DeckOfFlashCards(json_obj=json_obj)
+            except FileNotFoundError:
+                print("Invalid file name.")
+                continue
 
     def _ask_question(self):
-        #ToDo
-        raise NotImplementedError
+        self.current_card = self.deck.get_random_card()
+        print("Question: ")
+        print(self.current_card.question)
 
     def _give_answer(self):
-        #ToDo
-        raise NotImplementedError
+        print("Answer: ")
+        print(self.current_card.answer)
 
     @staticmethod
     def _give_instructions_card():
